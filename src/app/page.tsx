@@ -1,6 +1,8 @@
 import { fetchUASData } from "@/lib/googleSheets";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 
+export const dynamic = 'force-static';
+
 export default async function Home() {
   const data = await fetchUASData();
 

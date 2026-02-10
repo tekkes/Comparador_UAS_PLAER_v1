@@ -8,12 +8,27 @@ import { ComparisonTable } from './ComparisonTable';
 import { ComparisonCharts } from './ComparisonCharts';
 import { PDFExportButton } from './PDFExportButton';
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+
 interface Props {
-    selectedUAS: UAS[];
+    allData: UAS[];
 }
 
-export const ComparisonClient = ({ selectedUAS }: Props) => {
+export const ComparisonClient = ({ allData }: Props) => {
+    const searchParams = useSearchParams();
+    const router = useRouter();
     const [viewMode, setViewMode] = useState<'table' | 'charts'>('table');
+
+    const selectedUAS = useMemo(() => {
+        const ids = searchParams.get('ids')?.split(',') || [];
+        return allData.filter(u => ids.includes(u.id));
+    }, [allData, searchParams]);
+
+    // Redirect if no selection (optional, or just show empty state)
+    if (selectedUAS.length === 0 && searchParams.get('ids')) {
+        // If IDs are present but no matches found, maybe just show empty
+    }
 
     return (
         <div className="flex flex-col gap-6">

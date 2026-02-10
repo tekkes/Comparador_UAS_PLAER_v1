@@ -1,25 +1,18 @@
 import { fetchUASData } from "@/lib/googleSheets";
 import { ComparisonClient } from "@/components/comparison/ComparisonClient";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function ComparePage({
-    searchParams,
-}: {
-    searchParams: Promise<{ ids?: string }>;
-}) {
-    const resolvedParams = await searchParams;
-    const ids = resolvedParams.ids?.split(',') || [];
+export const dynamic = 'force-static';
 
-    if (ids.length === 0) {
-        redirect('/');
-    }
-
+export default async function ComparePage() {
+    // Fetch ALL data at build time
     const allData = await fetchUASData();
-    const selectedUAS = allData.filter(u => ids.includes(u.id));
 
     return (
         <div className="min-h-full">
-            <ComparisonClient selectedUAS={selectedUAS} />
+            <Suspense fallback={<div className="text-center p-10">Loading comparison...</div>}>
+                <ComparisonClient allData={allData} />
+            </Suspense>
         </div>
     );
 }
