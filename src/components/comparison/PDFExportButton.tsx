@@ -9,6 +9,8 @@ import { useState } from 'react';
 
 interface Props {
     uas: UAS[];
+    onExportStart?: () => void;
+    onExportEnd?: () => void;
 }
 
 const getDataUrl = (url: string): Promise<string> => {
@@ -29,13 +31,18 @@ const getDataUrl = (url: string): Promise<string> => {
     });
 };
 
-export const PDFExportButton = ({ uas }: Props) => {
+export const PDFExportButton = ({ uas, ...props }: Props) => {
     const [generating, setGenerating] = useState(false);
 
     const handleExport = async () => {
         setGenerating(true);
-        // Small delay to let UI show spinner
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Trigger parent state to show the export overlay
+        if (uas.length > 0 && props.onExportStart) {
+            props.onExportStart();
+        }
+
+        // Wait for the overlay to render and charts to stabilize (animations disabled but DOM needs paint)
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         // Capture Charts
         let chartsDataUrl = null;
@@ -258,6 +265,9 @@ export const PDFExportButton = ({ uas }: Props) => {
         }
 
         doc.save(`UAS_Comparison_PLAER_${new Date().toISOString().split('T')[0]}.pdf`);
+        if (props.onExportEnd) {
+            props.onExportEnd();
+        }
         setGenerating(false);
     };
 

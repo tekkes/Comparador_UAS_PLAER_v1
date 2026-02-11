@@ -19,6 +19,7 @@ export const ComparisonClient = ({ allData }: Props) => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [viewMode, setViewMode] = useState<'table' | 'charts'>('table');
+    const [isExporting, setIsExporting] = useState(false);
 
     const selectedUAS = useMemo(() => {
         const ids = searchParams.get('ids')?.split(',') || [];
@@ -61,7 +62,11 @@ export const ComparisonClient = ({ allData }: Props) => {
                     </div>
 
                     {/* Replaced the placeholder button with the PDFExportButton component */}
-                    <PDFExportButton uas={selectedUAS} />
+                    <PDFExportButton
+                        uas={selectedUAS}
+                        onExportStart={() => setIsExporting(true)}
+                        onExportEnd={() => setIsExporting(false)}
+                    />
                 </div>
             </div>
 
@@ -98,10 +103,18 @@ export const ComparisonClient = ({ allData }: Props) => {
                             </p>
                         </div>
 
-                        {/* Hidden Charts for PDF Export (Off-screen but visible) */}
-                        <div className="fixed top-0 left-[-3000px] w-[1200px] h-auto bg-slate-900 z-50 pointer-events-none">
-                            <ComparisonCharts uas={selectedUAS} id="comparison-charts-export" exportMode={true} />
-                        </div>
+                        {/* Export Overlay - ONLY visible during export */}
+                        {isExporting && (
+                            <div className="fixed inset-0 z-[9999] bg-slate-900/95 flex items-center justify-center">
+                                <div className="text-center w-full max-w-5xl">
+                                    <h2 className="text-2xl font-bold text-white mb-8 animate-pulse">Generating Report, please wait...</h2>
+                                    <div className="bg-slate-900 p-8 rounded-xl border border-slate-700">
+                                        {/* The ID here matches what PDFExportButton looks for */}
+                                        <ComparisonCharts uas={selectedUAS} id="comparison-charts-export" exportMode={true} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
