@@ -47,7 +47,9 @@ export const PDFExportButton = ({ uas }: Props) => {
                 const canvas = await (await import('html2canvas')).default(chartsElement, {
                     scale: 2,
                     backgroundColor: '#0f172a', // Match theme background
-                    logging: false
+                    useCORS: true,
+                    logging: true,
+                    windowWidth: 1600
                 });
                 chartsDataUrl = canvas.toDataURL('image/png');
             }
@@ -234,17 +236,25 @@ export const PDFExportButton = ({ uas }: Props) => {
         });
 
         // --- CHARTS ---
-        // Always add to 2nd page
+        // Try to fit on Page 1, else Page 2
+        // @ts-ignore
+        let finalY = doc.lastAutoTable.finalY + 10;
+
         if (chartsDataUrl) {
-            doc.addPage();
+            const chartsHeight = 80; // approximate height needed in mm
+
+            if (finalY + chartsHeight > pageHeight - margin) {
+                // Not enough space, add new page
+                doc.addPage();
+                finalY = 20;
+            }
 
             doc.setFontSize(12);
             doc.setTextColor(15, 23, 42); // slate-900
-            doc.text("Performance Comparison Charts", margin, 20);
+            doc.text("Performance Comparison Charts", margin, finalY - 3);
 
-            // Aspect ratio of charts
-            // Assuming 16:9 roughly or capture dimensions
-            doc.addImage(chartsDataUrl, 'PNG', margin, 25, pageWidth - (margin * 2), 0); // 0 height means auto-scale
+            // Render image
+            doc.addImage(chartsDataUrl, 'PNG', margin, finalY, pageWidth - (margin * 2), 0); // 0 = auto height
         }
 
         doc.save(`UAS_Comparison_PLAER_${new Date().toISOString().split('T')[0]}.pdf`);
