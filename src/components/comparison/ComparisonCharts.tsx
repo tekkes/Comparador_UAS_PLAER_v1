@@ -31,26 +31,39 @@ export const ComparisonCharts = ({ uas, id = "comparison-charts-container", expo
         return null;
     };
 
-    const ChartBlock = ({ title, dataKey, unit }: { title: string, dataKey: keyof UAS, unit: string }) => (
-        <div className="bg-slate-950/30 p-4 rounded-xl border border-slate-800">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 ml-2">{title}</h3>
-            <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={uas} layout="vertical" margin={{ left: 0, right: 30, top: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                        <XAxis type="number" stroke="#64748b" fontSize={12} tickFormatter={(val) => `${val}`} />
-                        <YAxis type="category" dataKey="name" stroke="#cbd5e1" fontSize={11} width={100} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b', opacity: 0.4 }} wrapperStyle={{ zIndex: 100 }} />
-                        <Bar dataKey={dataKey} radius={[0, 4, 4, 0]} unit={unit} isAnimationActive={!exportMode}>
-                            {uas.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
+    const ChartBlock = ({ title, dataKey, unit }: { title: string, dataKey: keyof UAS, unit: string }) => {
+        // Dynamic sizing based on mode
+        const ChartWrapper = exportMode ? 'div' : ResponsiveContainer;
+        const wrapperProps = exportMode ? { style: { width: '100%', height: 300 } } : { width: '100%', height: '100%' };
+
+        return (
+            <div className="bg-slate-950/30 p-4 rounded-xl border border-slate-800">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 ml-2">{title}</h3>
+                <div className="h-64">
+                    {/* @ts-ignore */}
+                    <ChartWrapper {...wrapperProps}>
+                        <BarChart
+                            width={exportMode ? 500 : undefined}
+                            height={exportMode ? 300 : undefined}
+                            data={uas}
+                            layout="vertical"
+                            margin={{ left: 0, right: 30, top: 0, bottom: 0 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+                            <XAxis type="number" stroke="#64748b" fontSize={12} tickFormatter={(val) => `${val}`} />
+                            <YAxis type="category" dataKey="name" stroke="#cbd5e1" fontSize={11} width={100} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b', opacity: 0.4 }} wrapperStyle={{ zIndex: 100 }} />
+                            <Bar dataKey={dataKey} radius={[0, 4, 4, 0]} unit={unit} isAnimationActive={!exportMode}>
+                                {uas.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ChartWrapper>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div id={id} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">

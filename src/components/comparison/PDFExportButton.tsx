@@ -59,9 +59,13 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
                     windowWidth: 1600
                 });
                 chartsDataUrl = canvas.toDataURL('image/png');
+            } else {
+                console.warn("Chart element not found!");
+                // alert("Debug: Chart element not found!"); // Uncomment if needed
             }
         } catch (error) {
             console.error("Error capturing charts:", error);
+            // alert("Debug: Error capturing charts: " + JSON.stringify(error));
         }
 
         const doc = new jsPDF({
