@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 import { UAS } from './types';
 
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRuV7E0wUj3tMnfbw38JEh_R_KI5TpUgQrOd_1RqyRnvQXFpRQbhD0fC5U_KqgSUG83m0X_BCeXedTV/pub?output=csv';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEdOvbOF_rH_r4KQI1ZxXRcKSzGx_dSW0hEGM4qMIHjDsiJwoNgRjrIYBH4xaPOMBpG-0qQC_dNllo/pub?output=csv';
 
 // Helper to clean numeric values (remove non-numeric chars except . and -)
 const cleanNumber = (val: string): number => {
