@@ -42,7 +42,7 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
         }
 
         // Wait for the overlay to render and charts to stabilize (animations disabled but DOM needs paint)
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Capture Charts
         let chartsDataUrl = null;
@@ -60,12 +60,17 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
                 });
                 chartsDataUrl = canvas.toDataURL('image/png');
             } else {
-                console.warn("Chart element not found!");
-                // alert("Debug: Chart element not found!"); // Uncomment if needed
+                alert("DEBUG ALERT: Chart element NOT found in DOM. Check ID 'comparison-charts-export'.");
             }
         } catch (error) {
             console.error("Error capturing charts:", error);
-            // alert("Debug: Error capturing charts: " + JSON.stringify(error));
+            alert("DEBUG ALERT: Error during html2canvas: " + String(error));
+        }
+
+        if (chartsDataUrl) {
+            // alert("DEBUG: Charts captured! Length: " + chartsDataUrl.length);
+        } else {
+            alert("DEBUG ALERT: Charts captured but Data URL is empty/null.");
         }
 
         const doc = new jsPDF({
