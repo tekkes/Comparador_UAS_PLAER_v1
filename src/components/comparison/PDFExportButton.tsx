@@ -76,30 +76,47 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
         const pageHeight = doc.internal.pageSize.height;
         const margin = 14;
 
-        // --- HEADER ---
-        doc.setFillColor(15, 23, 42); // slate-900
-        doc.rect(0, 0, pageWidth, 25, 'F');
+        // --- HEADER HELPER ---
+        const addHeader = (doc: jsPDF, showTitle: boolean = true) => {
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 14;
 
-        // Logo
+            doc.setFillColor(15, 23, 42); // slate-900
+            doc.rect(0, 0, pageWidth, 25, 'F');
+
+            // Logo
+            if (logoData) {
+                try {
+                    doc.addImage(logoData, 'PNG', pageWidth - 25, 2, 16, 20); // Top right
+                } catch (e) {
+                    console.error("Logo load error", e);
+                }
+            }
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text("PLAER // UAS COMPARADOR", margin, 12);
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text("Comparative Analysis Report", margin, 18);
+
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184); // slate-400
+            doc.text(`Generated: ${new Date().toLocaleString('es-ES')}`, margin, 29);
+        };
+
+        // Load Logo once
+        let logoData: string | null = null;
         try {
-            const logoData = await getDataUrl('/shield.png');
-            doc.addImage(logoData, 'PNG', pageWidth - 25, 2, 16, 20); // Top right
+            logoData = await getDataUrl('/shield.png');
         } catch (e) {
             console.error("Logo load error", e);
         }
 
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text("PLAER // UAS COMPARADOR", margin, 12);
-
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text("Comparative Analysis Report", margin, 18);
-
-        doc.setFontSize(8);
-        doc.setTextColor(148, 163, 184); // slate-400
-        doc.text(`Generated: ${new Date().toLocaleString('es-ES')}`, margin, 29);
+        // Add Header to Page 1
+        addHeader(doc);
 
         // --- TITLE & SYSTEMS ---
         doc.setTextColor(15, 23, 42); // slate-900
@@ -255,7 +272,8 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
             if (finalY + chartsHeight > pageHeight - margin) {
                 // Not enough space, add new page
                 doc.addPage();
-                finalY = 20;
+                addHeader(doc, false); // Add header to Page 2
+                finalY = 40; // Start below header
             }
 
             doc.setFontSize(12);
