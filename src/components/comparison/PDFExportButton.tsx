@@ -180,25 +180,17 @@ export const PDFExportButton = ({ uas }: Props) => {
         });
 
         // --- CHARTS ---
-        // Add charts after the table, or on a new page if no space
-        // @ts-ignore
-        let finalY = doc.lastAutoTable.finalY + 10;
-
+        // Always add to 2nd page
         if (chartsDataUrl) {
-            // Check if there is enough space, else add page
-            const chartsHeight = 80; // approximate height in mm
-            if (finalY + chartsHeight > pageHeight - 20) {
-                doc.addPage();
-                finalY = 20;
-            }
+            doc.addPage();
 
             doc.setFontSize(12);
             doc.setTextColor(15, 23, 42); // slate-900
-            doc.text("Performance Comparison Charts", margin, finalY - 3);
+            doc.text("Performance Comparison Charts", margin, 20);
 
             // Aspect ratio of charts
             // Assuming 16:9 roughly or capture dimensions
-            doc.addImage(chartsDataUrl, 'PNG', margin, finalY, pageWidth - (margin * 2), 0); // 0 height means auto-scale
+            doc.addImage(chartsDataUrl, 'PNG', margin, 25, pageWidth - (margin * 2), 0); // 0 height means auto-scale
         }
 
         doc.save(`UAS_Comparison_PLAER_${new Date().toISOString().split('T')[0]}.pdf`);

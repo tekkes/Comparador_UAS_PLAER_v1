@@ -52,6 +52,19 @@ export const ComparisonTable = ({ uas }: Props) => {
         { label: "Link Range (km)", key: 'datalink_range_km', type: 'number' },
         { label: "Ceiling (m)", key: 'ceiling_m', type: 'number' },
 
+        { label: "Dimensions", type: 'text' },
+        { label: "Length (m)", key: 'length_m', type: 'number' },
+        { label: "Wingspan (m)", key: 'wingspan_m', type: 'number' },
+        { label: "Height (m)", key: 'height_m', type: 'number' },
+
+        { label: "Propulsion", type: 'text' },
+        { label: "Powerplant", key: 'powerplant_type', type: 'text' },
+        { label: "Fuel", key: 'fuel_type', type: 'text' },
+
+        { label: "Mission Capabilities", type: 'text' },
+        { label: "Payload Capacity (kg)", key: 'payload_capacity_kg', type: 'number' },
+        { label: "Sensors", key: 'payload_type', type: 'text' },
+
         { label: "Capabilities", type: 'text' },
         { label: "Laser Rangefinder", key: 'laser_rangefinder', type: 'bool' },
         { label: "Laser Designator", key: 'laser_designator', type: 'bool' },
