@@ -110,7 +110,9 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
         // Load Logo once
         let logoData: string | null = null;
         try {
-            logoData = await getDataUrl('/shield.png');
+            // Fix for GitHub Pages basePath
+            const basePath = window.location.hostname.includes('github.io') ? '/Comparador_UAS_PLAER_v1' : '';
+            logoData = await getDataUrl(`${basePath}/shield.png`);
         } catch (e) {
             console.error("Logo load error", e);
         }

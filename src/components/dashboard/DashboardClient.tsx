@@ -7,16 +7,38 @@ import { FilterBar } from '@/components/dashboard/FilterBar';
 import { UASList } from '@/components/dashboard/UASList';
 import { Search } from 'lucide-react';
 
+import { fetchUASData } from '@/lib/googleSheets';
+import { Loader2 } from 'lucide-react';
+
 interface DashboardClientProps {
-    initialData: UAS[];
+    initialData?: UAS[]; // Optional now
 }
 
-export const DashboardClient = ({ initialData }: DashboardClientProps) => {
+export const DashboardClient = ({ initialData = [] }: DashboardClientProps) => {
     const router = useRouter();
+    const [data, setData] = useState<UAS[]>(initialData);
+    const [loading, setLoading] = useState(true);
     const [selectedUAS, setSelectedUAS] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     // In a real app, we would have complex filter state key-value pairs
     const [activeFilters, setActiveFilters] = useState<UASFilter>({});
+
+    React.useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const freshData = await fetchUASData();
+                if (freshData.length > 0) {
+                    setData(freshData);
+                }
+            } catch (error) {
+                console.error("Failed to load live data", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, []);
 
     const toggleSelection = (id: string) => {
         if (selectedUAS.includes(id)) {
@@ -31,7 +53,7 @@ export const DashboardClient = ({ initialData }: DashboardClientProps) => {
     };
 
     const filteredData = useMemo(() => {
-        return initialData.filter(uas => {
+        return data.filter(uas => {
             const matchesSearch = uas.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 uas.manufacturer.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -49,7 +71,7 @@ export const DashboardClient = ({ initialData }: DashboardClientProps) => {
 
             return matchesSearch && matchesManufacturer && matchesCountry && matchesGroup;
         });
-    }, [initialData, searchTerm, activeFilters]);
+    }, [data, searchTerm, activeFilters]);
 
     return (
         <div className="flex flex-col gap-6 h-full">
@@ -86,7 +108,7 @@ export const DashboardClient = ({ initialData }: DashboardClientProps) => {
             <div className="flex gap-6 relative items-start">
                 {/* Filters Sidebar */}
                 <div className="w-72 flex-shrink-0 sticky top-24">
-                    <FilterBar data={initialData} filters={activeFilters} setFilters={setActiveFilters} />
+                    <FilterBar data={data} filters={activeFilters} setFilters={setActiveFilters} />
                 </div>
 
                 {/* Main Grid */}
@@ -105,6 +127,16 @@ export const DashboardClient = ({ initialData }: DashboardClientProps) => {
                         </div>
                     )}
                 </div>
+
+                {/* Loading Overlay */}
+                {loading && (
+                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl">
+                        <div className="flex flex-col items-center gap-2">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <span className="text-sm font-medium text-muted-foreground">Updating data...</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
