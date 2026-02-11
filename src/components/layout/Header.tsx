@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun, Clock, Monitor } from 'lucide-react';
 import { useTheme } from "next-themes";
+import Image from 'next/image';
 
 export const Header = () => {
     const [time, setTime] = useState<string>("");
@@ -34,8 +35,8 @@ export const Header = () => {
             <header className="fixed top-0 left-0 right-0 h-20 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 z-50 shadow-sm">
                 <div className="flex items-center gap-4">
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-bold tracking-wider text-primary">BASE DE DATOS UAS</h1>
-                        <span className="text-xs text-muted-foreground font-mono tracking-widest">PLAER SYSTEM</span>
+                        <h1 className="text-lg md:text-xl font-bold tracking-wider text-primary truncate max-w-[300px] md:max-w-none">Comparador de Prestaciones UAS - MALE - PLAER</h1>
+                        <span className="text-[10px] md:text-xs text-muted-foreground font-mono tracking-widest truncate">Plataforma de Análisis y Evaluación de Recursos</span>
                     </div>
                 </div>
             </header>
@@ -46,8 +47,8 @@ export const Header = () => {
         <header className="fixed top-0 left-0 right-0 h-20 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 z-50 shadow-sm transition-colors duration-300">
             <div className="flex items-center gap-4">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-bold tracking-wider text-primary">BASE DE DATOS UAS</h1>
-                    <span className="text-xs text-muted-foreground font-mono tracking-widest">PLAER SYSTEM</span>
+                    <h1 className="text-lg md:text-xl font-bold tracking-wider text-primary truncate max-w-[300px] md:max-w-none">Comparador de Prestaciones UAS - MALE - PLAER</h1>
+                    <span className="text-[10px] md:text-xs text-muted-foreground font-mono tracking-widest truncate">Plataforma de Análisis y Evaluación de Recursos</span>
                 </div>
             </div>
 
@@ -55,6 +56,16 @@ export const Header = () => {
                 <div className="hidden md:flex items-center gap-2 text-sm text-foreground bg-secondary/50 px-3 py-1 rounded-md border border-border">
                     <Clock size={14} className="text-primary" />
                     <span className="capitalize">{time}</span>
+                </div>
+
+                <div className="relative w-8 h-10 md:w-10 md:h-12">
+                    <Image
+                        src="/shield.png"
+                        alt="Escudo"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
                 </div>
 
                 <button

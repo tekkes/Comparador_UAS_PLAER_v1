@@ -3,6 +3,7 @@ import { UAS } from '@/lib/types';
 import { Check, Plane, Scale, Gauge, Signal, Clock, Database, Crosshair, Radio, Battery, Anchor, AlertCircle, Eye, Zap, Box, Users } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { getCountryCode } from '@/lib/countries';
 
 interface Props {
     uas: UAS;
@@ -39,7 +40,10 @@ export const UASCard = ({ uas, isSelected, onToggle }: Props) => {
                     <div className="text-[10px] text-primary font-bold uppercase tracking-widest mb-0.5 flex items-center justify-center gap-2">
                         <span>{uas.manufacturer}</span>
                         <span className="w-1 h-1 rounded-full bg-primary/50"></span>
-                        <span>{uas.country}</span>
+                        <span className="flex items-center gap-1">
+                            <span className={`fi fi-${getCountryCode(uas.country)} rounded-sm shadow-sm`}></span>
+                            {uas.country}
+                        </span>
                     </div>
                     <h3 className="text-lg font-bold text-white leading-tight truncate" title={uas.name}>
                         {uas.name}

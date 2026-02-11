@@ -11,6 +11,24 @@ interface Props {
     uas: UAS[];
 }
 
+const getDataUrl = (url: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return reject('No ctx');
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+};
+
 export const PDFExportButton = ({ uas }: Props) => {
     const [generating, setGenerating] = useState(false);
 
@@ -35,7 +53,15 @@ export const PDFExportButton = ({ uas }: Props) => {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text("PLAER SYSTEM // UAS COMPARATOR", 14, 13);
+        doc.text("PLAER // UAS COMPARATOR", 24, 13); // Adjusted x for logo space
+
+        // Logo
+        try {
+            const logoData = await getDataUrl('/shield.png');
+            doc.addImage(logoData, 'PNG', 15, 5, 8, 10); // x, y, w, h
+        } catch (e) {
+            console.error("Logo load error", e);
+        }
 
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
@@ -109,7 +135,7 @@ export const PDFExportButton = ({ uas }: Props) => {
                 doc.setFontSize(8);
                 doc.setTextColor(148, 163, 184); // slate-400
                 doc.text(`Page ${data.pageNumber}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-                doc.text("PLAER SYSTEM Confidential", 14, pageHeight - 10);
+                doc.text("PLAER Confidential", 14, pageHeight - 10);
             }
         });
 

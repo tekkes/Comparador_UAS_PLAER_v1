@@ -1,0 +1,44 @@
+export const getCountryCode = (countryName: string): string => {
+    if (!countryName) return 'un'; // United Nations flag as fallback
+
+    const normalize = (str: string) => str.toLowerCase().trim();
+    const name = normalize(countryName);
+
+    const countryMap: { [key: string]: string } = {
+        'usa': 'us',
+        'united states': 'us',
+        'us': 'us',
+        'spain': 'es',
+        'españa': 'es',
+        'israel': 'il',
+        'turkey': 'tr',
+        'türkiye': 'tr',
+        'china': 'cn',
+        'prc': 'cn',
+        'france': 'fr',
+        'germany': 'de',
+        'uk': 'gb',
+        'united kingdom': 'gb',
+        'great britain': 'gb',
+        'italy': 'it',
+        'iran': 'ir',
+        'russia': 'ru',
+        'ukraine': 'ua',
+        'poland': 'pl',
+        'australia': 'au',
+        'canada': 'ca',
+        'sweden': 'se',
+        'norway': 'no',
+        'switzerland': 'ch',
+        'south korea': 'kr',
+        'korea': 'kr',
+        'japan': 'jp',
+        'brazil': 'br',
+        'india': 'in',
+        'uae': 'ae',
+        'united arab emirates': 'ae',
+        'south africa': 'za',
+    };
+
+    return countryMap[name] || 'un';
+};

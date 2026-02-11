@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${publicSans.className} min-h-screen transition-colors duration-300`}>
+      <body className={`${publicSans.className} min-h-screen transition-colors duration-300 bg-grid-pattern`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className="pt-24 px-6 pb-12 w-full max-w-[1920px] mx-auto">
