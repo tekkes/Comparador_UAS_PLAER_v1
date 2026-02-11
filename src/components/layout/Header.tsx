@@ -64,7 +64,7 @@ export const Header = () => {
                 <div className="relative w-8 h-10 md:w-10 md:h-12">
                     {/* Use basePath for production image loading */}
                     <Image
-                        src={`${basePath}/shield.png`}
+                        src="/shield.png"
                         alt="Escudo"
                         fill
                         className="object-contain"
