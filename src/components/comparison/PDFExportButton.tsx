@@ -53,7 +53,7 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
                 // @ts-ignore
                 const canvas = await (await import('html2canvas')).default(chartsElement, {
                     scale: 2,
-                    backgroundColor: '#0f172a', // Match theme background
+                    backgroundColor: '#ffffff', // White background for PDF
                     useCORS: true,
                     logging: true,
                     windowWidth: 1600
