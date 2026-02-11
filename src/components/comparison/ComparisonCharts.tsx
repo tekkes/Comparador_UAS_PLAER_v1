@@ -36,9 +36,15 @@ export const ComparisonCharts = ({ uas, id = "comparison-charts-container", expo
         const ChartWrapper = exportMode ? 'div' : ResponsiveContainer;
         const wrapperProps = exportMode ? { style: { width: '100%', height: 300 } } : { width: '100%', height: '100%' };
 
+        // Hardcode colors for export to avoid 'oklab'/CSS var issues in html2canvas
+        const containerStyle = exportMode
+            ? { backgroundColor: '#0f172a', borderColor: '#1e293b', borderWidth: '1px', borderStyle: 'solid' }
+            : {};
+        const titleStyle = exportMode ? { color: '#94a3b8' } : {};
+
         return (
-            <div className="bg-slate-950/30 p-4 rounded-xl border border-slate-800">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 ml-2">{title}</h3>
+            <div className={exportMode ? "p-4 rounded-xl" : "bg-slate-950/30 p-4 rounded-xl border border-slate-800"} style={containerStyle}>
+                <h3 className={exportMode ? "text-sm font-bold uppercase tracking-wider mb-4 ml-2" : "text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 ml-2"} style={titleStyle}>{title}</h3>
                 <div className="h-64">
                     {/* @ts-ignore */}
                     <ChartWrapper {...wrapperProps}>
@@ -66,7 +72,7 @@ export const ComparisonCharts = ({ uas, id = "comparison-charts-container", expo
     };
 
     return (
-        <div id={id} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+        <div id={id} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4" style={exportMode ? { backgroundColor: '#0f172a' } : {}}>
             <ChartBlock title="Maximum Takeoff Weight (MTOW)" dataKey="mtow_kg" unit="kg" />
             <ChartBlock title="Link Range (Data)" dataKey="datalink_range_km" unit="km" />
             <ChartBlock title="Cruise Speed" dataKey="cruise_speed_kmh" unit="km/h" />

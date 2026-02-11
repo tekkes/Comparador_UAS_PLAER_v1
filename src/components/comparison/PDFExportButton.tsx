@@ -60,17 +60,10 @@ export const PDFExportButton = ({ uas, ...props }: Props) => {
                 });
                 chartsDataUrl = canvas.toDataURL('image/png');
             } else {
-                alert("DEBUG ALERT: Chart element NOT found in DOM. Check ID 'comparison-charts-export'.");
+                console.warn("Chart element not found!");
             }
         } catch (error) {
             console.error("Error capturing charts:", error);
-            alert("DEBUG ALERT: Error during html2canvas: " + String(error));
-        }
-
-        if (chartsDataUrl) {
-            // alert("DEBUG: Charts captured! Length: " + chartsDataUrl.length);
-        } else {
-            alert("DEBUG ALERT: Charts captured but Data URL is empty/null.");
         }
 
         const doc = new jsPDF({
