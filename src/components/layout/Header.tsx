@@ -62,14 +62,11 @@ export const Header = () => {
                 </div>
 
                 <div className="relative w-8 h-10 md:w-10 md:h-12">
-                    {/* Use basePath for production image loading */}
-                    <Image
-                        src="/shield.png"
+                    {/* Use basePath for production image loading - standard img for max compatibility */}
+                    <img
+                        src={`${basePath}/shield.png`}
                         alt="Escudo"
-                        fill
-                        className="object-contain"
-                        priority
-                        unoptimized // Ensure it loads if next/image has issues with external export
+                        className="object-contain h-full w-full"
                     />
                 </div>
 
