@@ -7,9 +7,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 interface Props {
     uas: UAS[];
     id?: string;
+    exportMode?: boolean;
 }
 
-export const ComparisonCharts = ({ uas, id = "comparison-charts-container" }: Props) => {
+export const ComparisonCharts = ({ uas, id = "comparison-charts-container", exportMode = false }: Props) => {
     // Prep data for Recharts
     // We want to compare multple metrics. Maybe separate charts or one big one?
     // Different scales (kg vs km/h vs km) means separate charts are better.
@@ -39,8 +40,8 @@ export const ComparisonCharts = ({ uas, id = "comparison-charts-container" }: Pr
                         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
                         <XAxis type="number" stroke="#64748b" fontSize={12} tickFormatter={(val) => `${val}`} />
                         <YAxis type="category" dataKey="name" stroke="#cbd5e1" fontSize={11} width={100} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b', opacity: 0.4 }} />
-                        <Bar dataKey={dataKey} radius={[0, 4, 4, 0]} unit={unit}>
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b', opacity: 0.4 }} wrapperStyle={{ zIndex: 100 }} />
+                        <Bar dataKey={dataKey} radius={[0, 4, 4, 0]} unit={unit} isAnimationActive={!exportMode}>
                             {uas.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                             ))}
