@@ -37,49 +37,69 @@ export const PDFExportButton = ({ uas }: Props) => {
         // Small delay to let UI show spinner
         await new Promise(resolve => setTimeout(resolve, 500));
 
+        // Capture Charts
+        let chartsDataUrl = null;
+        try {
+            const chartsElement = document.getElementById('comparison-charts-container');
+            if (chartsElement) {
+                // @ts-ignore
+                const canvas = await (await import('html2canvas')).default(chartsElement, {
+                    scale: 2,
+                    backgroundColor: '#0f172a', // Match theme background
+                    logging: false
+                });
+                chartsDataUrl = canvas.toDataURL('image/png');
+            }
+        } catch (error) {
+            console.error("Error capturing charts:", error);
+        }
+
         const doc = new jsPDF({
-            orientation: 'landscape',
+            orientation: 'portrait',
             unit: 'mm',
             format: 'a4'
         });
 
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
+        const margin = 14;
 
         // --- HEADER ---
         doc.setFillColor(15, 23, 42); // slate-900
-        doc.rect(0, 0, pageWidth, 20, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text("PLAER // UAS COMPARATOR", 24, 13); // Adjusted x for logo space
+        doc.rect(0, 0, pageWidth, 25, 'F');
 
         // Logo
         try {
             const logoData = await getDataUrl('/shield.png');
-            doc.addImage(logoData, 'PNG', 15, 5, 8, 10); // x, y, w, h
+            doc.addImage(logoData, 'PNG', pageWidth - 25, 2, 16, 20); // Top right
         } catch (e) {
             console.error("Logo load error", e);
         }
 
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Generated: ${new Date().toLocaleString('es-ES')}`, pageWidth - 14, 13, { align: 'right' });
-
-        // --- TITLE ---
-        doc.setTextColor(15, 23, 42); // slate-900
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text("Comparative Analysis Report", 14, 35);
+        doc.text("PLAER // UAS COMPARADOR", margin, 12);
 
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text("Comparative Analysis Report", margin, 18);
+
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184); // slate-400
+        doc.text(`Generated: ${new Date().toLocaleString('es-ES')}`, margin, 29);
+
+        // --- TITLE & SYSTEMS ---
+        doc.setTextColor(15, 23, 42); // slate-900
         doc.setFontSize(10);
-        doc.setTextColor(100, 116, 139); // slate-500
+        doc.setFont('helvetica', 'bold');
         const systemNames = uas.map(u => u.name).join(' vs ');
-        doc.text(doc.splitTextToSize(`Systems: ${systemNames}`, pageWidth - 28), 14, 42);
+        const splitTitle = doc.splitTextToSize(`Systems: ${systemNames}`, pageWidth - (margin * 2));
+        doc.text(splitTitle, margin, 35);
+
+        let startY = 35 + (splitTitle.length * 5) + 5;
 
         // --- TABLE DATA ---
-        // Define rows properly mapped
         const getVal = (u: UAS, key: keyof UAS) => {
             const val = u[key];
             if (typeof val === 'boolean') return val ? 'YES' : 'NO';
@@ -94,11 +114,26 @@ export const PDFExportButton = ({ uas }: Props) => {
             { section: "Physical", label: "MTOW (kg)", key: 'mtow_kg' },
             { section: "Physical", label: "Wingspan (m)", key: 'wingspan_m' },
             { section: "Physical", label: "Length (m)", key: 'length_m' },
+            { section: "Physical", label: "Height (m)", key: 'height_m' },
             { section: "Performance", label: "Endurance (hr)", key: 'endurance_hours' },
-            { section: "Performance", label: "Range (km)", key: 'aircraft_range_km' },
-            { section: "Performance", label: "Speed (km/h)", key: 'max_speed_kmh' },
-            { section: "Capabilities", label: "Laser RF", key: 'laser_rangefinder' },
-            { section: "Capabilities", label: "SATCOM", key: 'blos_satcom' },
+            { section: "Performance", label: "Range (Air) (km)", key: 'aircraft_range_km' },
+            { section: "Performance", label: "Range (DL) (km)", key: 'datalink_range_km' },
+            { section: "Performance", label: "Speed (Max) (km/h)", key: 'max_speed_kmh' },
+            { section: "Performance", label: "Speed (Cr) (km/h)", key: 'cruise_speed_kmh' },
+            { section: "Performance", label: "Ceiling (m)", key: 'ceiling_m' },
+            { section: "Propulsion", label: "Powerplant", key: 'powerplant_type' },
+            { section: "Propulsion", label: "Fuel", key: 'fuel_type' },
+            { section: "Ops", label: "Runway (m)", key: 'runway_min_m' },
+            { section: "Ops", label: "Crew", key: 'crew_size' },
+            { section: "Comms", label: "Freq", key: 'datalink_freq' },
+            { section: "Payload", label: "Capacity (kg)", key: 'payload_capacity_kg' },
+            { section: "Payload", label: "Sensors", key: 'payload_type' },
+            { section: "Cap (Bool)", label: "Laser RF", key: 'laser_rangefinder' },
+            { section: "Cap (Bool)", label: "Laser Des", key: 'laser_designator' },
+            { section: "Cap (Bool)", label: "SATCOM", key: 'blos_satcom' },
+            { section: "Cap (Bool)", label: "SAR", key: 'sar_capability' },
+            { section: "Cap (Bool)", label: "EW", key: 'ew_capability' },
+            { section: "Cap (Bool)", label: "Kinetic", key: 'kinetic_load' },
         ];
 
         const tableBody = rows.map(r => [
@@ -107,39 +142,66 @@ export const PDFExportButton = ({ uas }: Props) => {
         ]);
 
         autoTable(doc, {
-            startY: 50,
-            head: [['Parameter', ...uas.map(u => u.name)]],
+            startY: startY,
+            head: [['Param', ...uas.map(u => u.name)]],
             body: tableBody,
             theme: 'grid',
             headStyles: {
                 fillColor: [30, 41, 59], // slate-800
                 textColor: 255,
+                fontSize: 8,
                 fontStyle: 'bold',
-                halign: 'center'
+                halign: 'center',
+                cellPadding: 2
             },
             columnStyles: {
-                0: { fontStyle: 'bold', cellWidth: 40, fillColor: [241, 245, 249] }, // slate-100 for labels
+                0: { fontStyle: 'bold', cellWidth: 30, fillColor: [241, 245, 249], fontSize: 7 }, // slate-100 for labels
                 // Dynamic columns for UAS data
             },
             styles: {
-                fontSize: 9,
-                cellPadding: 3,
+                fontSize: 7,
+                cellPadding: 1.5,
                 lineColor: [226, 232, 240], // slate-200
                 lineWidth: 0.1,
+                overflow: 'linebreak',
+                valign: 'middle'
             },
             alternateRowStyles: {
                 fillColor: [248, 250, 252] // slate-50
             },
+            margin: { left: margin, right: margin },
             didDrawPage: (data) => {
                 // Footer
                 doc.setFontSize(8);
                 doc.setTextColor(148, 163, 184); // slate-400
-                doc.text(`Page ${data.pageNumber}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-                doc.text("PLAER Confidential", 14, pageHeight - 10);
+                doc.text(`Page ${data.pageNumber}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+                doc.text("PLAER Confidential", margin, pageHeight - 8);
             }
         });
 
-        doc.save(`UAS_Comparison_${new Date().toISOString().split('T')[0]}.pdf`);
+        // --- CHARTS ---
+        // Add charts after the table, or on a new page if no space
+        // @ts-ignore
+        let finalY = doc.lastAutoTable.finalY + 10;
+
+        if (chartsDataUrl) {
+            // Check if there is enough space, else add page
+            const chartsHeight = 80; // approximate height in mm
+            if (finalY + chartsHeight > pageHeight - 20) {
+                doc.addPage();
+                finalY = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.setTextColor(15, 23, 42); // slate-900
+            doc.text("Performance Comparison Charts", margin, finalY - 3);
+
+            // Aspect ratio of charts
+            // Assuming 16:9 roughly or capture dimensions
+            doc.addImage(chartsDataUrl, 'PNG', margin, finalY, pageWidth - (margin * 2), 0); // 0 height means auto-scale
+        }
+
+        doc.save(`UAS_Comparison_PLAER_${new Date().toISOString().split('T')[0]}.pdf`);
         setGenerating(false);
     };
 

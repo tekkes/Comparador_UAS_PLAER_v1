@@ -51,7 +51,7 @@ export const ComparisonCharts = ({ uas }: Props) => {
     );
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+        <div id="comparison-charts-container" className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
             <ChartBlock title="Maximum Takeoff Weight (MTOW)" dataKey="mtow_kg" unit="kg" />
             <ChartBlock title="Maximum Range" dataKey="aircraft_range_km" unit="km" />
             <ChartBlock title="Cruise Speed" dataKey="cruise_speed_kmh" unit="km/h" />

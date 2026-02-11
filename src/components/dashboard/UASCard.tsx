@@ -23,11 +23,11 @@ export const UASCard = ({ uas, isSelected, onToggle }: Props) => {
             <div className="relative h-28 bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-3 overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-grid-white/[0.05] z-0"></div>
 
-                {/* Selection Checkbox */}
+                {/* Selection Checkbox (Moved to Left) */}
                 <button
                     onClick={(e) => { e.stopPropagation(); onToggle(); }}
                     className={clsx(
-                        "absolute top-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center transition-all z-20 shadow-sm",
+                        "absolute top-2 left-2 w-6 h-6 rounded-full border flex items-center justify-center transition-all z-20 shadow-sm",
                         isSelected
                             ? "bg-primary border-primary text-primary-foreground scale-110"
                             : "border-white/20 bg-black/20 text-transparent hover:border-primary hover:text-primary/80"
@@ -36,14 +36,16 @@ export const UASCard = ({ uas, isSelected, onToggle }: Props) => {
                     <Check size={14} strokeWidth={3} />
                 </button>
 
-                <div className="text-center z-10 w-full pl-2 pr-8">
+                {/* Country Flag (Large, Top Right) */}
+                <div className="absolute top-2 right-2 z-10 opacity-90 hover:opacity-100 transition-opacity">
+                    <span className={`fi fi-${getCountryCode(uas.country)} rounded shadow-sm text-4xl block`}></span>
+                </div>
+
+                <div className="text-center z-10 w-full px-4 mt-2">
                     <div className="text-[10px] text-primary font-bold uppercase tracking-widest mb-0.5 flex items-center justify-center gap-2">
                         <span>{uas.manufacturer}</span>
                         <span className="w-1 h-1 rounded-full bg-primary/50"></span>
-                        <span className="flex items-center gap-1">
-                            <span className={`fi fi-${getCountryCode(uas.country)} rounded-sm shadow-sm`}></span>
-                            {uas.country}
-                        </span>
+                        <span>{uas.country}</span>
                     </div>
                     <h3 className="text-lg font-bold text-white leading-tight truncate" title={uas.name}>
                         {uas.name}

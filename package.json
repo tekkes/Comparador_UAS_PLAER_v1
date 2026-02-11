@@ -12,6 +12,7 @@
     "@types/papaparse": "^5.5.2",
     "clsx": "^2.1.1",
     "flag-icons": "^7.5.0",
+    "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.563.0",
