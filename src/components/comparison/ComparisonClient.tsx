@@ -97,6 +97,11 @@ export const ComparisonClient = ({ allData }: Props) => {
                                 })()}
                             </p>
                         </div>
+
+                        {/* Hidden Charts for PDF Export (Always Rendered) */}
+                        <div className="fixed left-[-9999px] top-[-9999px] w-[1200px] h-[800px] bg-slate-900 overflow-hidden pointer-events-none">
+                            <ComparisonCharts uas={selectedUAS} id="comparison-charts-export" />
+                        </div>
                     </>
                 )}
             </div>

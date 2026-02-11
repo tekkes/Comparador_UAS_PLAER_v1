@@ -40,7 +40,8 @@ export const PDFExportButton = ({ uas }: Props) => {
         // Capture Charts
         let chartsDataUrl = null;
         try {
-            const chartsElement = document.getElementById('comparison-charts-container');
+            // Target the hidden export container
+            const chartsElement = document.getElementById('comparison-charts-export');
             if (chartsElement) {
                 // @ts-ignore
                 const canvas = await (await import('html2canvas')).default(chartsElement, {

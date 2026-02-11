@@ -6,9 +6,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 interface Props {
     uas: UAS[];
+    id?: string;
 }
 
-export const ComparisonCharts = ({ uas }: Props) => {
+export const ComparisonCharts = ({ uas, id = "comparison-charts-container" }: Props) => {
     // Prep data for Recharts
     // We want to compare multple metrics. Maybe separate charts or one big one?
     // Different scales (kg vs km/h vs km) means separate charts are better.
@@ -51,7 +52,7 @@ export const ComparisonCharts = ({ uas }: Props) => {
     );
 
     return (
-        <div id="comparison-charts-container" className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+        <div id={id} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
             <ChartBlock title="Maximum Takeoff Weight (MTOW)" dataKey="mtow_kg" unit="kg" />
             <ChartBlock title="Link Range (Data)" dataKey="datalink_range_km" unit="km" />
             <ChartBlock title="Cruise Speed" dataKey="cruise_speed_kmh" unit="km/h" />
