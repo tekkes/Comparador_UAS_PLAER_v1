@@ -142,6 +142,42 @@ export const PDFExportButton = ({ uas }: Props) => {
             ...uas.map(u => getVal(u, r.key as keyof UAS))
         ]);
 
+        // Logic for highlighting "Best" values
+        // Define which keys trigger "Max" is better vs "Min" is better
+        const bestValueConfig: Record<string, 'max' | 'min'> = {
+            'mtow_kg': 'max',
+            'wingspan_m': 'max', // bigger usually implies more cap
+            'length_m': 'max',
+            'height_m': 'max',
+            'endurance_hours': 'max',
+            'aircraft_range_km': 'max',
+            'datalink_range_km': 'max',
+            'max_speed_kmh': 'max',
+            'cruise_speed_kmh': 'max',
+            'ceiling_m': 'max',
+            'payload_capacity_kg': 'max',
+            'runway_min_m': 'min', // shorter runway is better
+            'crew_size': 'min', // smaller crew is better efficient
+        };
+
+        const bestValues: Record<string, number> = {};
+
+        rows.forEach(row => {
+            const config = bestValueConfig[row.key];
+            if (config) {
+                const values = uas.map(u => parseFloat(String(u[row.key as keyof UAS] || 0)));
+                if (config === 'max') {
+                    bestValues[row.key] = Math.max(...values);
+                } else {
+                    // Filter out 0s for min calculations if 0 implies missing data? 
+                    // Assuming valid data. If 0 is valid "no runway", handle carefully.
+                    // For now simple min.
+                    const validValues = values.filter(v => v > 0);
+                    bestValues[row.key] = validValues.length ? Math.min(...validValues) : 0;
+                }
+            }
+        });
+
         autoTable(doc, {
             startY: startY,
             head: [['Param', ...uas.map(u => u.name)]],
@@ -157,7 +193,6 @@ export const PDFExportButton = ({ uas }: Props) => {
             },
             columnStyles: {
                 0: { fontStyle: 'bold', cellWidth: 30, fillColor: [241, 245, 249], fontSize: 7 }, // slate-100 for labels
-                // Dynamic columns for UAS data
             },
             styles: {
                 fontSize: 7,
@@ -165,12 +200,30 @@ export const PDFExportButton = ({ uas }: Props) => {
                 lineColor: [226, 232, 240], // slate-200
                 lineWidth: 0.1,
                 overflow: 'linebreak',
-                valign: 'middle'
+                valign: 'middle',
+                halign: 'center'
             },
             alternateRowStyles: {
                 fillColor: [248, 250, 252] // slate-50
             },
             margin: { left: margin, right: margin },
+            didParseCell: (data) => {
+                // Apply conditional formatting
+                if (data.section === 'body' && data.column.index > 0) {
+                    const rowIndex = data.row.index;
+                    const rowKey = rows[rowIndex]?.key;
+
+                    if (rowKey && bestValues[rowKey] !== undefined) {
+                        const cellVal = parseFloat(data.cell.raw as string);
+                        // Compare with tolerance or exact
+                        if (cellVal === bestValues[rowKey]) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = [220, 252, 231]; // green-100
+                            data.cell.styles.textColor = [21, 128, 61]; // green-700
+                        }
+                    }
+                }
+            },
             didDrawPage: (data) => {
                 // Footer
                 doc.setFontSize(8);
